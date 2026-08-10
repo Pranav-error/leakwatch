@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}LeakWatch — findings{% endblock %}
+{% block body %}
+  <div class="banner">
+    Values shown are <strong>masked previews</strong>, not the real secrets. Raw
+    secrets are never stored. Use findings to notify owners — never to access accounts.
+  </div>
+
+  <form class="filters" method="get">
+    <div>
+      <label>Provider</label>
+      <select name="provider">
+        <option value="">all</option>
+        {% for p in providers %}
+          <option value="{{ p }}" {% if p == f_provider %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Status</label>
+      <select name="status">
+        <option value="">all</option>
+        {% for s in statuses %}
+          <option value="{{ s }}" {% if s == f_status %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Repo contains</label>
+      <input type="text" name="repo" value="{{ f_repo }}" placeholder="owner/name">
+    </div>
+    <button type="submit">Filter</button>
+  </form>
+
+  <p class="muted">{{ findings|length }} finding(s)</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Provider</th><th>Preview</th><th>Repo</th><th>File</th>
+        <th>Source</th><th>Status</th><th>Last seen</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in findings %}
+      <tr>
+        <td><span class="pill">{{ f.provider }}</span></td>
+        <td><code>{{ f.preview }}</code></td>
+        <td><a href="/finding/{{ f.id }}">{{ f.repo }}</a></td>
+        <td class="muted">{{ f.file_path }}{% if f.line %}:{{ f.line }}{% endif %}</td>
+        <td class="muted">{{ f.source }}</td>
+        <td>{{ f.status }}</td>
+        <td class="muted">{{ f.last_seen.strftime("%Y-%m-%d %H:%M") }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="muted">No findings yet. Run a source to populate.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Finding · {{ finding.repo }}{% endblock %}
+{% block body %}
+  <p><a href="/">← all findings</a></p>
+  <h2 style="margin-bottom:4px;">
+    <span class="pill">{{ finding.provider }}</span> in {{ finding.repo }}
+  </h2>
+
+  <table style="max-width:640px; margin: 14px 0;">
+    <tr><th>Preview</th><td><code>{{ finding.preview }}</code> <span class="muted">({{ finding.length }} chars)</span></td></tr>
+    <tr><th>Fingerprint</th><td><code>{{ finding.fingerprint[:16] }}…</code></td></tr>
+    <tr><th>File</th><td>{{ finding.file_path }}{% if finding.line %}:{{ finding.line }}{% endif %}</td></tr>
+    <tr><th>Location</th><td><a href="{{ finding.location_url }}" target="_blank" rel="noopener">{{ finding.location_url }}</a></td></tr>
+    <tr><th>Source</th><td>{{ finding.source }}</td></tr>
+    <tr><th>First seen</th><td>{{ finding.first_seen.strftime("%Y-%m-%d %H:%M UTC") }}</td></tr>
+    <tr><th>Last seen</th><td>{{ finding.last_seen.strftime("%Y-%m-%d %H:%M UTC") }}</td></tr>
+  </table>
+
+  <form method="post" action="/finding/{{ finding.id }}/status" style="margin-bottom:24px;">
+    <label>Review status</label>
+    <select name="status">
+      {% for s in statuses %}
+        <option value="{{ s }}" {% if s == finding.status %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Update</button>
+  </form>
+
+  <h3>Disclosure draft <span class="muted" style="font-size:13px; font-weight:normal;">— review, then send manually</span></h3>
+  <div class="banner">LeakWatch does not send this for you. Copy it, verify it's right, and contact the owner yourself.</div>
+  <pre>{{ disclosure }}</pre>
+{% endblock %}
